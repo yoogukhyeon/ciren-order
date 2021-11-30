@@ -51,13 +51,13 @@ const orders = collection(store , "orders");
 
 export default function Home() {
   const [items , setItems] = useState(coffee.map(item => ({...item , count: 0})));
+  const [drinkings , setDrinking] = useState(drinking.map(item => ({...item , count: 0})))
   const router = useRouter();
   const auth = getAuth(firebaseApp) 
   const [loaded , setLoaded] = useState(false)
   const [credential , setCredential] = useState(null)
 
-  const addItem = useCallback( (name) => {
-
+  const addCoffee = useCallback( (name) => {
      setItems(produce(items , draft => {
           const index = items.findIndex(item => item.name === name);
           draft[ index ].count++
@@ -65,7 +65,7 @@ export default function Home() {
 
   }, [items])
 
-  const removeItem = useCallback((name) => {
+  const removeCoffee = useCallback((name) => {
     setItems(produce(items , draft => {
       const index = items.findIndex(item => item.name === name);
       if(draft[index].count > 0){
@@ -74,9 +74,30 @@ export default function Home() {
     }))
   }, [items])
 
+
+  const addDrinking = useCallback( (name) => {
+    setDrinking(produce(drinkings , draft => {
+      const index = drinkings.findIndex(item => item.name === name);
+      draft[ index ].count++
+    }))
+  }, [drinkings])
+
+
+  const removeDrinking = useCallback( (name) => {
+    setDrinking(produce(drinkings , draft => {
+      const index = drinkings.findIndex(item => item.name === name)
+      if(draft[index].count > 0){
+        draft[index].count--
+      }
+    }))
+  })
+
+
+  const coffeeTotal = sum(items.map(item => item.price * item.count)) 
+  const drinkingTotal = sum(drinkings.map(item => item.price * item.count))
   const total = useMemo(() => {
-    return sum(items.map(item => item.price * item.count))
-  }, [items])
+    return coffeeTotal + drinkingTotal
+  }, [items , drinkings])
 
   const [orderId , setOrderId] = useState(null);
   const [order , setOrder] = useState(null);
@@ -123,6 +144,7 @@ export default function Home() {
                 return 'text-success'
           case "픽업 완료":
                 setItems(coffee.map(item => ({...item , count : 0})))
+                setDrinking(drinkings.map(item => ({...item , count : 0})))
                 setOrderId(null)
                 setOrder(null)
                 return 'text-muted'
@@ -198,6 +220,7 @@ export default function Home() {
                 // const paymentResult = await requestPayment();
                   const order = {
                     ...values,
+                    drinkings,
                     items,
                     status: '주문 완료',
                     createdAt : new Date(),
@@ -207,7 +230,8 @@ export default function Home() {
                   const result = await addDoc(orders , order);
                   const id = result._key.path.segments[1];
                   setOrderId(id);
-
+                  const resetName = values.name = ""
+                  resetName;
                   // const ref = doc(store , 'orders', id);
                   // const orderData = await getDoc(ref);
                   // const data = orderData.data();
@@ -215,8 +239,6 @@ export default function Home() {
                   //   id,
                   //   ...data,
                   // })
-                  // const resetName = values.name = ""
-                  // resetName;
                   }}
               >
               {({
@@ -256,7 +278,7 @@ export default function Home() {
                                     <div className="mt-1">
                                        <button type="button" 
                                                className="btn btn-outline-secondary btn-xs"
-                                               onClick={() => addItem( item.name )}
+                                               onClick={() => addCoffee( item.name )}
                                                >담기</button>
                                     </div>
                                   </dd>
@@ -283,7 +305,7 @@ export default function Home() {
                                   <div className="tab-pane fade show active" id="qwe">
                                     <dl className="row py-3 px-2">
                                     {coffee.map(item => (
-                                          <Fragment> 
+                                          <Fragment key={item.name}> 
                                             <dt>
                                                 <label htmlFor="coffee1">
                                                   {item.name}
@@ -296,7 +318,7 @@ export default function Home() {
                                               <div className="mt-1">
                                             <button type="button" 
                                                className="btn btn-outline-secondary btn-xs"
-                                               onClick={() => addItem( item.name )}
+                                               onClick={() => addCoffee( item.name )}
                                                >담기</button>
                                              </div>
                                             </dd> 
@@ -316,7 +338,7 @@ export default function Home() {
                                                     <div>
                                                     <button type="button" 
                                                           className="btn btn-outline-secondary btn-xs"
-                                                          onClick={() => removeItem( item.name )}
+                                                          onClick={() => removeCoffee( item.name )}
                                                           >뺴기</button>
                                                     </div>
                                                 </dd>
@@ -325,13 +347,63 @@ export default function Home() {
                                         </dl>
                                 </div>
 
+
+
+
                                     <div className="tab-pane fade" id="asd">
-                                      <p>Nunc vitae turpis id nibh sodales commodo et non augue. Proin fringilla ex nunc. Integer tincidunt risus ut facilisis tristique.</p>
+                                       <dl className="row py-3 px-2">
+                                            {drinking.map(item => (
+                                                <Fragment key={item.name}>
+                                                  <dt>
+                                                    <label htmlFor="">
+                                                        {item.name}
+                                                    </label>
+                                                  </dt>
+                                                  <dd className="flex justify-between">
+                                                    <div>
+                                                      {formatter.format(item.price)}
+                                                    </div>
+                                                    <div>
+                                                     
+                                                      <button type="button" className="btn btn-outline-secondary btn-xs" 
+                                                          onClick={() => addDrinking(item.name)}>
+                                                        담기
+                                                      </button>
+                                                    </div>
+                                                  </dd>
+                                                </Fragment>
+                                            ))}
+                                       </dl>
+                                       <hr />
+                                        <h2>주문서</h2>
+                                        <dl>
+                                          {drinkings.map(item => (
+                                              <Fragment key={item.name}>
+                                                  <dt>{item.name} &times; {item.count}</dt>
+                                                  <dd className="flex justify-between items-end">
+                                                    <div>{formatter.format(item.price)}원</div>
+                                                    <div>
+                                                      <button type="button" className="btn btn-outline-secondary btn-xs" 
+                                                        onClick={() => removeDrinking(item.name)}
+                                                      >빼기</button>
+                                                    </div>
+                                                  </dd>
+                                              
+                                              </Fragment>
+                                          ))}
+                                        </dl>
+
                                     </div>
+
+
+
 
                                     <div className="tab-pane fade" id="zxc">
                                       <p>Curabitur dignissim quis nunc vitae laoreet. Etiam ut mattis leo, vel fermentum tellus. Sed sagittis rhoncus venenatis. Quisque commodo consectetur faucibus. Aenean eget ultricies justo.</p>
                                     </div>
+
+
+
 
                                   </div>
                               </div>
@@ -349,8 +421,8 @@ export default function Home() {
                             <div className="mb-3">
                                 합계 : {total}원
                             </div>
-                            {errors.total && (<p className="text-danger">{errors.total}</p>)}
-                          
+                            {errors.total && (<p className="text-danger">{errors.total}</p>)} 
+                           
                          
 
 
