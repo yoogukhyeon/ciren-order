@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "antd": "^4.17.2",
     "cardinal": "^2.1.1",
     "export": "^0.1.337",
     "firebase": "^9.5.0",
@@ -16,7 +17,8 @@
     "immer": "^9.0.7",
     "next": "12.0.4",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "tiny-uid": "^1.1.1"
   },
   "devDependencies": {
     "eslint": "7.32.0",
