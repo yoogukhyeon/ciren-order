@@ -405,7 +405,7 @@ export default function Home() {
 
 
                                     <div className="tab-pane fade" id="zxc">
-                                      <p>Curabitur dignissim quis nunc vitae laoreet. Etiam ut mattis leo, vel fermentum tellus. Sed sagittis rhoncus venenatis. Quisque commodo consectetur faucibus. Aenean eget ultricies justo.</p>
+                                      <p>메뉴 업그레드 준비중.</p>
                                     </div>
 
 
