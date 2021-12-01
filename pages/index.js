@@ -106,36 +106,31 @@ export default function Home() {
   const [order , setOrder] = useState(null);
 
  
-  // const requestPayment = useCallback(() => {
-  //   return new Promise((resolve , reject) => {
-  //           // IMP.request_pay(param, callback) 결제창 호출
-  //           IMP.request_pay({ // param
-  //             pg: "html5_inicis",
-  //             pay_method: "card",
-  //             merchant_uid: uid(),
-  //             name: items.map(item => `${item.name} ${item.count}개`).join(', '),
-  //             amount: total,
-  //             buyer_email: credential.email,
-  //             buyer_name: credential.displayName,
-  //             buyer_tel: credential.phoneNumber,
-  //             buyer_addr: "매장 방문",
-  //             buyer_postcode: "01181"
-  //         }, function (rsp) { // callback
-  //             if (rsp.success) {
-  //                 resolve(rsp)
-  //                 console.log('결제성공')
-                
-  //             } else {
-  //                 reject('결제 실패')
-  //             }
-  //         });
-  //   })
-   
-  
-  // }, [items , total])
-
-
-
+   const requestPayment = useCallback(() => {
+     return new Promise((resolve , reject) => {
+             // IMP.request_pay(param, callback) 결제창 호출
+             IMP.request_pay({ // param
+               pg: "html5_inicis",
+               pay_method: "card",
+               merchant_uid: uid(),
+               name: items.map(item => `${item.name} ${item.count}개`).join(', '),
+               amount: total,
+               buyer_email: credential.email,
+               buyer_name: credential.displayName,
+               buyer_tel: credential.phoneNumber,
+               buyer_addr: "매장 방문",
+               buyer_postcode: "01181"
+           }, function (rsp) { // callback
+               if (rsp.success) {
+                   resolve(rsp)
+                   console.log('결제성공')
+              
+               } else {
+                   reject('결제 실패')
+               }
+           });
+     })
+  }, [items , total])
 
   const statusClassName = useMemo(() => {
         switch(order?.status){
@@ -191,8 +186,10 @@ export default function Home() {
       </Head>
       
       <div className="container">
-        <div className="flex flex-row justify-between items-center">
-            <h1 className="mt-2">커피 주문</h1>
+        <div className="flex flex-row justify-between items-center" style={{borderBottom: "1px solid #eee"}}>
+            <h1 className="mt-2"><img src="./images/starbus.png" className="img-thumbnail" alt="..." 
+                style={{width : '120px'} , {height : '120px'}}
+            /></h1>
             <Button key="sign-out" onClick={() => {
                 if(!confirm('정말로 로그아웃 하실건가요?')){
                   return false
@@ -220,14 +217,14 @@ export default function Home() {
                 return errors
               }}
               onSubmit={ async (values) => {
-                // const paymentResult = await requestPayment();
+                 const paymentResult = await requestPayment();
                   const order = {
                     ...values,
                     drinkings,
                     items,
                     status: '주문 완료',
                     createdAt : new Date(),
-                    // paymentResult,
+                    paymentResult,
                   }
                 
                   const result = await addDoc(orders , order);
@@ -255,13 +252,16 @@ export default function Home() {
               }) => (
                   <form onSubmit={handleSubmit}>
                            <div className="my-4">
+                             <label htmlFor="name" className="px-2 mb-2" style={{fontSize: "18px" , fontWeight : "bold" , color: "#666"} }>고객명을 입력주세요</label>
                             <input type="text" 
                                    className="form-control" 
+                                   id="name"
                                    placeholder="이름을 입력해주세요." 
                                    name="name"
                                    value={values.name}
                                    onChange={handleChange}
                                    onBlur={handleBlur}
+                                   required
                                    />
                               {errors.name && touched.name && <p className="text-danger ml-1 mt-2">{errors.name}</p>}
                           </div>
