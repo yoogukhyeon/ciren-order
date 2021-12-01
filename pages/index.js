@@ -57,6 +57,9 @@ export default function Home() {
   const [loaded , setLoaded] = useState(false)
   const [credential , setCredential] = useState(null)
 
+
+
+
   const addCoffee = useCallback( (name) => {
      setItems(produce(items , draft => {
           const index = items.findIndex(item => item.name === name);
@@ -330,22 +333,24 @@ export default function Home() {
 
                                     <h2>주문서</h2>
                                           <dl>
-                                          {items.map(item => (
-                                              <Fragment key={item.name}>
-                                                <dt>{item.name} &times; {item.count}</dt>
-                                                <dd className="flex justify-between items-end">
-                                                    <div>{formatter.format(item.price)}원</div>
-                                                    <div>
-                                                    <button type="button" 
-                                                          className="btn btn-outline-secondary btn-xs"
-                                                          onClick={() => removeCoffee( item.name )}
-                                                          >뺴기</button>
-                                                    </div>
-                                                </dd>
-                                              </Fragment>
-                                          ))}
-                                        </dl>
-                                </div>
+                                              {items.map(item => (
+                                                item.count > 0 && (
+                                                  <Fragment key={item.name}>
+                                                  <dt>{item.name} &times; {item.count}</dt>
+                                                  <dd className="flex justify-between items-end">
+                                                      <div>{formatter.format(item.price)}원</div>
+                                                      <div>
+                                                      <button type="button" 
+                                                            className="btn btn-outline-secondary btn-xs"
+                                                            onClick={() => removeCoffee( item.name )}
+                                                            >뺴기</button>
+                                                      </div>
+                                                  </dd>
+                                                </Fragment>
+                                                )
+                                              ))}
+                                          </dl>                                
+                                      </div>
 
 
 
@@ -378,18 +383,19 @@ export default function Home() {
                                         <h2>주문서</h2>
                                         <dl>
                                           {drinkings.map(item => (
-                                              <Fragment key={item.name}>
-                                                  <dt>{item.name} &times; {item.count}</dt>
-                                                  <dd className="flex justify-between items-end">
-                                                    <div>{formatter.format(item.price)}원</div>
-                                                    <div>
-                                                      <button type="button" className="btn btn-outline-secondary btn-xs" 
-                                                        onClick={() => removeDrinking(item.name)}
-                                                      >빼기</button>
-                                                    </div>
-                                                  </dd>
-                                              
-                                              </Fragment>
+                                              item.count > 0 && (
+                                                <Fragment key={item.name}>
+                                                <dt>{item.name} &times; {item.count}</dt>
+                                                <dd className="flex justify-between items-end">
+                                                  <div>{formatter.format(item.price)}원</div>
+                                                  <div>
+                                                    <button type="button" className="btn btn-outline-secondary btn-xs" 
+                                                      onClick={() => removeDrinking(item.name)}
+                                                    >빼기</button>
+                                                  </div>
+                                                </dd>
+                                            </Fragment>
+                                              )
                                           ))}
                                         </dl>
 
@@ -428,7 +434,7 @@ export default function Home() {
 
                      
                           {!order && (
-                             <button type="submit" className="btn btn-primary btn-lg">주문</button>
+                             <button type="submit" className="btn btn-primary btn-lg mb-3">주문</button>
                           )}
                           {order && (
                              <p>주문 상태 : <span className={statusClassName} style={{fontWeight : "bold"}}>{order.status}</span></p>
