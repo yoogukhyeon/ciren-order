@@ -90,7 +90,7 @@ export default function Home() {
         draft[index].count--
       }
     }))
-  })
+  }, [drinkings])
 
 
   const coffeeTotal = sum(items.map(item => item.price * item.count)) 
