@@ -11,6 +11,9 @@ export default function SignIn(){
     const router = useRouter();
     return(
         <div className="flex justify-center items-center h-screen">
+             <h1 className="mt-2"><img src="./images/starbus.png" className="img-thumbnail" alt="..." 
+                style={{width : '120px'} , {height : '120px'}}
+             /></h1>
             <Button onClick={() => {
                 const auth = getAuth(firebaseApp)
                 const provider = new GoogleAuthProvider();
